@@ -443,6 +443,75 @@ const _selectBase=select;
 select=function(id){_selectBase(id);openDetail(id)};
 ALL();select('HIS');
 </script>
+<!--PAIRS-ADDON-START-->
+<style>
+.prs{margin-top:18px}.prs h4{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 4px}
+.prs .pr{border-top:1px solid #eef0f3;padding:7px 4px;cursor:pointer;font-size:12.5px}.prs .pr:hover,.prs .pr.on{background:#f3f6fa}
+.prs .pr .t{display:flex;justify-content:space-between;gap:8px}.prs .pr .t b{font-weight:600}.prs .pr .m{color:var(--mute);font-size:11.5px}
+.psc{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;border-radius:9px;padding:1px 7px;white-space:nowrap}
+.pairbox{border:1px solid #cfdcec;background:#f5f8fc;border-radius:8px;padding:9px 11px;margin:10px 0;font-size:12.5px}
+.pairbox h4{margin:0 0 6px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--acc)}
+.pairbox .it{border-top:1px solid #e3eaf3;padding:5px 0}.pairbox .it:first-of-type{border-top:0}
+#zPairs.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+</style>
+<script>
+/*PAIRS-DATA-START*/const PAIRS=[{"id":"P1","name":"FloForm + Kent Business Campus","stage":"01","hub":"15","mi":0.84,"city":"Kent","sf":222003,"pct":190,"ask":27570000,"score":5,"note":"FloForm's 32-34 ft clear stage building with mill, storage and wardrobe on site; Kent Business Campus's 71,801 SF of office suites for the Hub. FloForm unpriced, FEMA zone AE, sale status to confirm."},{"id":"P2","name":"22601 76th Ave S + Kent Business Campus","stage":"05","hub":"15","mi":0.7,"city":"Kent","sf":157815,"pct":135,"ask":42370000,"score":4,"note":"24 ft clear stage building with 4 grade doors; power upgrade needed (600 A)."},{"id":"P3","name":"FloForm + 228th Manufacturing Campus","stage":"01","hub":"13","mi":0.92,"city":"Kent","sf":138143,"pct":118,"ask":0,"score":3,"note":"Hub side is five small low-ceilinged buildings around a yard; both unpriced."},{"id":"P4","name":"MBI Building + 950 Andover Park E","stage":"03","hub":"09","mi":1.09,"city":"Kent / Tukwila","sf":107144,"pct":92,"ask":25100000,"score":3,"note":"MBI has dock-high doors only (needs a drive-in door cut); 950 sits in Tukwila Urban Center zoning; Moderate aircraft noise at both."},{"id":"P5","name":"MBI Building + 19016 72nd Ave S","stage":"03","hub":"10","mi":0.1,"city":"Kent","sf":89144,"pct":76,"ask":22195000,"score":3,"note":"19016 layout and office unknown."},{"id":"P6","name":"MBI Building + West Valley Business Park","stage":"03","hub":"16","mi":0.23,"city":"Kent","sf":92858,"pct":79,"ask":16200000,"score":3,"note":"Same broker (NAI); 18601 unpriced."},{"id":"P7","name":"Oakesdale E5 + 950 Andover Park E","stage":"25","hub":"09","mi":1.13,"city":"Renton / Tukwila","sf":70914,"pct":61,"ask":19200000,"score":2,"note":"Stage side holds one mid-size stage."},{"id":"P8","name":"Tukwila Industrial + 950 Andover Park E","stage":"11","hub":"09","mi":0.35,"city":"Tukwila","sf":67960,"pct":58,"ask":8900000,"score":2,"note":"Stage side small, dock-high doors only."},{"id":"P9","name":"Leary Way portfolio + 1401 NW Leary Way","stage":"S10","hub":"S14","mi":0.1,"city":"Seattle","sf":165293,"pct":141,"ask":35000000,"score":4,"note":"24 ft warehouses fully leased (space opens as leases end); 11,942 SF office for the Hub."},{"id":"P10","name":"READ Products Interbay + 1401 NW Leary Way","stage":"S22","hub":"S14","mi":0.74,"city":"Seattle","sf":113051,"pct":97,"ask":11000000,"score":4,"note":"Two 24-28 ft clear buildings in Interbay; Hub across the Ship Canal; READ unpriced, 1945 buildings."},{"id":"P11","name":"Redmond 153rd Industrial + Willows NW Business Park","stage":"S5","hub":"S16","mi":0.32,"city":"Redmond","sf":50252,"pct":43,"ask":8550000,"score":2,"note":"Low clear heights; under half of Harbor Island's size."}];/*PAIRS-DATA-END*/
+(function(){
+ const byId=id=>PROPS.find(p=>p.id===id);
+ const live=()=>PAIRS.filter(q=>byId(q.stage)&&byId(q.hub));
+ const col=s=>fitCol(s);
+ const gPR=document.createElementNS(NS,'g');svg.insertBefore(gPR,gP);
+ let showPairs=true, hot=null;
+ const inv=()=>1/Math.max(1,Math.pow(W/vb.w,.85));
+ function draw(){gPR.innerHTML='';if(!showPairs)return;const k=inv();
+  for(const q of live()){const a=byId(q.stage),b=byId(q.hub);const x1=X(a.lon),y1=Y(a.lat),x2=X(b.lon),y2=Y(b.lat);const on=hot===q.id;
+   const g=el('g',{'class':'prg',style:'cursor:pointer'},gPR);
+   el('line',{x1,y1,x2,y2,stroke:'#fff','stroke-width':(on?9:7)*k,'stroke-linecap':'round'},g);
+   el('line',{x1,y1,x2,y2,stroke:col(q.score),'stroke-width':(on?5:3.2)*k,'stroke-linecap':'round','stroke-opacity':hot&&!on?.35:.95},g);
+   el('line',{x1,y1,x2,y2,stroke:'transparent','stroke-width':16*k},g);
+   if(on||W/vb.w>6){const t=el('text',{x:(x1+x2)/2+6*k,y:(y1+y2)/2-6*k,'font-size':11.5*k,'font-weight':700,fill:col(q.score),'paint-order':'stroke',stroke:'#fff','stroke-width':4*k},g);t.textContent=q.mi.toFixed(2)+' mi · pair '+q.score+'/5'}
+   el('title',{},g).textContent=a.name+' (stage) + '+b.name+' (Hub)';
+   g.addEventListener('pointerdown',e=>e.stopPropagation());
+   g.addEventListener('click',e=>{e.stopPropagation();focus(q.id,false)})}}
+ const _set=setVB;setVB=function(v,anim){_set(v,anim);draw()};
+ function popPair(q){const a=byId(q.stage),b=byId(q.hub);
+  pop.innerHTML=`<button class="x" aria-label="Close">×</button><h3>${q.name}</h3><div class="a">Stage + Hub pair · ${q.city}</div>
+  <div class="r"><span>Stage</span><span>${a.name}</span></div><div class="r"><span>Hub</span><span>${b.name}</span></div>
+  <div class="r"><span>Distance</span><span>${q.mi.toFixed(2)} mi straight line</span></div>
+  <div class="r"><span>Combined</span><span>${q.sf.toLocaleString()} SF · ${q.pct}% of HIS</span></div>
+  <div class="r"><span>Known asking</span><span>${q.ask?'$'+q.ask.toLocaleString():'Not published'}</span></div>
+  <div class="r"><span>Pair score</span><span>${q.score}/5</span></div>
+  <div style="margin-top:6px;color:var(--mute);font-size:11.5px">${q.note}</div>`;
+  pop.style.display='block';pop.querySelector('.x').onclick=e=>{e.stopPropagation();pop.style.display='none';hot=null;draw();list()};
+  const pt=svg.createSVGPoint();pt.x=(X(a.lon)+X(b.lon))/2;pt.y=(Y(a.lat)+Y(b.lat))/2;const sp=pt.matrixTransform(svg.getScreenCTM());const mb=mapbox.getBoundingClientRect();
+  const x=sp.x-mb.left,y=sp.y-mb.top,pw=pop.offsetWidth,ph=pop.offsetHeight;const left=Math.max(8,Math.min(mb.width-pw-8,x-pw/2));const above=y-ph-18>=8;
+  pop.classList.toggle('below',!above);pop.style.left=left+'px';pop.style.top=(above?y-ph-18:y+18)+'px';pop.style.setProperty('--ax',Math.max(14,Math.min(pw-14,x-left))+'px');pop.style.visibility='visible'}
+ function focus(id,zoom){const q=PAIRS.find(r=>r.id===id);if(!q)return;hot=id;showPairs=true;btn.classList.add('on');sel=null;
+  const a=byId(q.stage),b=byId(q.hub);
+  if(zoom){const lo0=Math.min(a.lon,b.lon),lo1=Math.max(a.lon,b.lon),la0=Math.min(a.lat,b.lat),la1=Math.max(a.lat,b.lat);const pl=Math.max(.012,(lo1-lo0)*.6),pa=Math.max(.008,(la1-la0)*.6);fit(lo0-pl,la0-pa,lo1+pl,la1+pa)}else draw();
+  popPair(q);list()}
+ // toggle button
+ const btn=document.createElement('button');btn.id='zPairs';btn.className='on';btn.textContent='Pairs';btn.title='Show or hide stage + Hub pairs';
+ document.querySelector('.zoom').insertBefore(btn,document.getElementById('zIn'));
+ btn.onclick=()=>{showPairs=!showPairs;btn.classList.toggle('on',showPairs);if(!showPairs){hot=null;}draw()};
+ // legend
+ const lg=document.querySelector('.legend');if(lg){const d=document.createElement('div');d.innerHTML='<span style="display:inline-block;width:18px;height:3px;background:#163f73;border-radius:2px"></span>Stage + Hub pair (color = pair score)';lg.appendChild(d)}
+ // list section
+ const box=document.createElement('div');box.className='prs';const note=document.querySelector('#list .note');note.parentNode.insertBefore(box,note);
+ function list(){const L=live().sort((x,y)=>y.score-x.score||x.mi-y.mi);
+  box.innerHTML=`<h4>Stage + Hub pairs within 2 mi · select one</h4>`+(L.length?L.map(q=>{const a=byId(q.stage),b=byId(q.hub);return `<div class="pr ${hot===q.id?'on':''}" data-p="${q.id}"><div class="t"><b>${a.name} + ${b.name}</b><span class="psc" style="background:${col(q.score)}">${q.score}/5</span></div><div class="m">Stage ${lab(a)} · Hub ${lab(b)} · ${q.mi.toFixed(2)} mi · ${q.sf.toLocaleString()} SF (${q.pct}% of HIS) · ${q.city}</div></div>`}).join(''):'<div class="m">None yet.</div>')+
+  '<div class="sm" style="color:var(--mute);font-size:11px;margin-top:6px">Distances are straight lines between map points; driving distance not measured. Pair score weighs the stage building\'s build-out potential, the Hub\'s office skeleton and site checks.</div>';
+  box.querySelectorAll('.pr').forEach(r=>r.onclick=()=>focus(r.dataset.p,true))}
+ // detail panel hook
+ const _sel=select;select=function(id){hot=null;_sel(id);draw();list();const L=live().filter(q=>q.stage===id||q.hub===id);if(!L.length)return;const card=document.getElementById('card');if(!card)return;
+  const d=document.createElement('div');d.className='pairbox';d.innerHTML='<h4>Stage + Hub pairs</h4>'+L.map(q=>{const other=byId(q.stage===id?q.hub:q.stage);const role=q.stage===id?'Stage here, Hub at':'Hub here, stage at';
+   return `<div class="it"><b>${role} ${other.name}</b> · ${q.mi.toFixed(2)} mi · pair ${q.score}/5<br><span style="color:var(--mute)">${q.sf.toLocaleString()} SF combined (${q.pct}% of HIS) · ${q.note}</span></div>`}).join('');
+  const y=card.querySelector('.yard');if(y)card.insertBefore(d,y);else card.appendChild(d)};
+ draw();list();
+})();
+</script>
+<!--PAIRS-ADDON-END-->
+
 </body>
 </html>
 
